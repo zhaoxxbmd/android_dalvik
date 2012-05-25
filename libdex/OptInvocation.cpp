@@ -118,6 +118,14 @@ char* dexOptGenerateCacheFileName(const char* fileName, const char* subFileName)
     if (dexRoot == NULL)
         dexRoot = "/data";
 
+    /* Cache anything stored on /system in cacheRoot, everything else in dataRoot */
+    if (!strncmp(absoluteFile, systemRoot, strlen(systemRoot))) {
+	property_get("dalvik.vm.dexopt-data-only", dexoptDataOnly, "");
+	if (strcmp(dexoptDataOnly, "1") != 0) {
+	    dexRoot = cacheRoot;
+	}
+    }
+
     snprintf(nameBuf, kBufLen, "%s/%s", dexRoot, kCacheDirectoryName);
 
     /* Tack on the file name for the actual cache file path.
